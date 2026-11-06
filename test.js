@@ -12,7 +12,7 @@ process.env.GOOGLE_SHEET_ID = "SHEET123";
 process.env.GOOGLE_SHEET_TAB = "Contacts";
 process.env.GOOGLE_SERVICE_ACCOUNT_JSON = JSON.stringify({ client_email: "bot@test.iam.gserviceaccount.com", private_key: privateKey });
 
-const { app } = require("./server");
+const { app } = require("./local-server");
 
 let server, base;
 const realFetch = global.fetch;
@@ -89,4 +89,27 @@ test("there is no way to read stored messages", async () => {
     const r = await realFetch(base + p);
     assert.notStrictEqual(r.status, 200);
   }
+});
+
+test("Vercel function: POST saves, GET is rejected", async () => {
+  const handler = require("./api/contact");
+  const mk = (method, body) => {
+    const r = { headers: { "x-forwarded-for": "7.7.7." + Math.floor(Math.random() * 250) }, method, body };
+    const out = { code: 0, json: null, h: {} };
+    const res = { setHeader: (k, v) => (out.h[k] = v), status: c => { out.code = c; return { json: j => (out.json = j) }; } };
+    return handler(r, res).then(() => out);
+  };
+  const before = sheetCalls.length;
+  const ok = await mk("POST", { name: "Asha", email: "asha@example.com", msg: "hello from vercel" });
+  assert.strictEqual(ok.code, 200);
+  assert.strictEqual(sheetCalls.length, before + 1);
+  const bad = await mk("GET");
+  assert.strictEqual(bad.code, 405);
+});
+
+test("rate limit: 6th message from one visitor is refused", async () => {
+  const { handleContact } = require("./lib/contact");
+  let last;
+  for (let i = 0; i < 6; i++) last = await handleContact({ name: "A", email: "a@b.co", msg: "hello there" }, "5.5.5.5");
+  assert.strictEqual(last.status, 429);
 });

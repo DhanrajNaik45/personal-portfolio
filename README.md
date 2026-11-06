@@ -12,6 +12,18 @@ npm start
 
 Open http://localhost:3000
 
+## Deploy on Vercel
+
+The site is served from `public/`. The contact form is the serverless function `api/contact.js`. In the Vercel project, open **Settings, then Environment Variables**, and add:
+
+| Name | Value |
+|---|---|
+| `GOOGLE_SHEET_ID` | the ID from your sheet's link |
+| `GOOGLE_SHEET_TAB` | `Contacts` |
+| `GOOGLE_SERVICE_ACCOUNT_JSON` | the full contents of your service account JSON key |
+
+Then redeploy. `local-server.js` is for local development only.
+
 ## Contact form setup
 
 1. Create a Google Cloud service account and turn on the Google Sheets API.

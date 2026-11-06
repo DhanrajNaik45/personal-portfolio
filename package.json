@@ -3,15 +3,16 @@
   "version": "1.0.0",
   "private": true,
   "description": "Portfolio site with a contact form that saves to a private Google Sheet",
-  "main": "server.js",
+  "main": "local-server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node local-server.js",
     "test": "node --test test.js"
   },
-  "engines": { "node": ">=18" },
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
     "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "express-rate-limit": "^7.4.0"
+    "express": "^4.19.2"
   }
 }
