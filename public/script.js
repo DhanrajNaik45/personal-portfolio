@@ -58,36 +58,124 @@ CONFIG.skills.forEach(s => {
 
 /* work */
 const grid = $("#workGrid"), filters = $("#filters"), modal = $("#modal"), mBody = $("#mBody");
-let opener = null;
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let opener = null, flowTimer = null;
+
+// "Label: text" items get a bold label
+function addItem(ul, text) {
+  const li = el("li");
+  const m = text.match(/^([^:.]{2,45}):\s(.+)$/);
+  if (m) { li.append(el("strong", "", m[1] + ": "), document.createTextNode(m[2])); }
+  else li.textContent = text;
+  ul.append(li);
+}
+
+// The animated "how it works" picture
+function buildFlow(steps) {
+  const wrap = el("div", "anim");
+  wrap.append(el("h4", "anim-title", "HOW IT WORKS"));
+  const line = el("div", "flowline");
+  const nodes = [], links = [];
+  steps.forEach((s, i) => {
+    if (i) { const l = el("span", "flink"); l.append(el("i")); line.append(l); links.push(l); }
+    const n = el("div", "fnode");
+    n.append(el("span", "fnum", String(i + 1)), el("span", "flabel", s.label));
+    line.append(n); nodes.push(n);
+  });
+  const cap = el("p", "fcap");
+  cap.setAttribute("aria-live", "polite");
+  wrap.append(line, cap);
+
+  const paint = i => {
+    nodes.forEach((n, j) => { n.classList.toggle("active", j === i); n.classList.toggle("done", j < i); });
+    links.forEach((l, j) => l.classList.toggle("on", j < i));
+    cap.textContent = steps[i].note;
+    cap.style.animation = "none"; void cap.offsetWidth; cap.style.animation = "";
+  };
+  if (reduce) {
+    // no motion: show every step as plain text
+    nodes.forEach(n => n.classList.add("done"));
+    links.forEach(l => l.classList.add("on"));
+    cap.remove();
+    const ol = el("ol", "fsteps");
+    steps.forEach(s => ol.append(el("li", "", s.label + ": " + s.note)));
+    wrap.append(ol);
+  } else {
+    let i = 0, paused = false;
+    paint(0);
+    const tick = () => {
+      if (paused) return;
+      i = (i + 1) % (steps.length + 1);
+      if (i === steps.length) {
+        // everything lit for a moment, then the loop restarts
+        nodes.forEach(n => { n.classList.remove("active"); n.classList.add("done"); });
+        links.forEach(l => l.classList.add("on"));
+      } else paint(i);
+    };
+    const start = () => { stopFlow(); flowTimer = setInterval(tick, 2200); };
+    start();
+    // Hover (or keyboard focus) on a step stops the animation on that step.
+    // Moving away lets it carry on from there.
+    nodes.forEach((n, k) => {
+      n.tabIndex = 0;
+      const hold = () => { paused = true; i = k; paint(k); };
+      const release = () => { paused = false; start(); };
+      n.addEventListener("mouseenter", hold);
+      n.addEventListener("mouseleave", release);
+      n.addEventListener("focus", hold);
+      n.addEventListener("blur", release);
+    });
+  }
+  return wrap;
+}
+
+function stopFlow() { if (flowTimer) { clearInterval(flowTimer); flowTimer = null; } }
+
 function openProject(p, btn) {
   opener = btn;
+  stopFlow();
   mBody.textContent = "";
+  const head = el("div", "m-head");
+  head.append(el("span", "m-status", p.status.toUpperCase()), el("span", "m-kind", p.kind.toUpperCase()));
   const title = el("h3", "", p.title);
   title.id = "mTitle";
-  mBody.append(el("span", "m-kind", p.kind.toUpperCase()), title, el("p", "text", p.text));
-  const flow = el("div", "flow");
-  p.flow.forEach(s => flow.append(el("span", "node", s)));
-  mBody.append(flow);
-  const ul = el("ul", "points");
-  p.points.forEach(t => ul.append(el("li", "", t)));
-  mBody.append(ul);
-  if (p.impact) mBody.append(el("p", "impact", p.impact));
+  mBody.append(head, title);
+  if (p.client) mBody.append(el("p", "m-client", p.client));
+  mBody.append(buildFlow(p.flow));
+
+  p.sections.forEach(s => {
+    const sec = el("section", "m-sec");
+    sec.append(el("h4", "", s.heading));
+    (s.text || []).forEach(t => sec.append(el("p", "", t)));
+    if (s.items) { const ul = el("ul", "points"); s.items.forEach(t => addItem(ul, t)); sec.append(ul); }
+    (s.groups || []).forEach(g => {
+      sec.append(el("h5", "", g.title));
+      const ul = el("ul", "points"); g.items.forEach(t => addItem(ul, t)); sec.append(ul);
+    });
+    mBody.append(sec);
+  });
+
+  const t = el("section", "m-sec");
+  t.append(el("h4", "", "Technologies"));
   const tags = el("div", "tags");
-  p.tech.forEach(t => tags.append(el("span", "tag", t)));
-  mBody.append(tags);
+  p.tech.forEach(x => tags.append(el("span", "tag", x)));
+  t.append(tags);
+  mBody.append(t);
   if (p.link) {
     const a = el("a", "live", p.link.label.toUpperCase());
     a.href = p.link.url; a.target = "_blank"; a.rel = "noopener";
     mBody.append(a);
   }
   modal.showModal();
+  modal.scrollTop = 0;
 }
+
 function draw(kind) {
   grid.textContent = "";
   CONFIG.projects.filter(p => kind === "ALL" || p.kind.toUpperCase() === kind).forEach(p => {
     const c = el("button", "card");
     c.type = "button";
-    c.append(el("span", "k", p.kind.toUpperCase()), el("h3", "", p.title), el("p", "", p.text), el("span", "more", "VIEW DETAILS →"));
+    c.append(el("span", "k", p.status.toUpperCase()), el("h3", "", p.title), el("p", "", p.sections[0].text[0]), el("span", "more", "VIEW DETAILS & HOW IT WORKS →"));
     c.addEventListener("click", () => openProject(p, c));
     grid.append(c);
   });
@@ -105,7 +193,7 @@ function draw(kind) {
 draw("ALL");
 $("#mClose").addEventListener("click", () => modal.close());
 modal.addEventListener("click", e => { if (e.target === modal) modal.close(); });
-modal.addEventListener("close", () => opener && opener.focus());
+modal.addEventListener("close", () => { stopFlow(); if (opener) opener.focus(); });
 
 /* process */
 CONFIG.steps.forEach(s => {
