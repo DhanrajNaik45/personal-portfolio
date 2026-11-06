@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dhanraj Naik | Software & CRM Developer</title>
+  <meta name="description" content="Software and CRM developer building web apps, mobile apps, automations and AI workflows." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="gridlines" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+
+  <header class="nav">
+    <a class="brand" href="#top">DHANRAJ NAIK</a>
+    <nav aria-label="Main">
+      <a href="#about">ABOUT</a>
+      <a href="#skills">SKILLS</a>
+      <a href="#work">PORTFOLIO</a>
+      <a href="#process">PROCESS</a>
+      <a href="#contact">CONTACT</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section id="top" class="hero dark">
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <p class="label"><span class="arrow">&#8599;</span> <span id="label"></span></p>
+          <h1><span id="first"></span><span class="outline" id="last"></span></h1>
+          <p class="lead" id="intro"></p>
+          <div class="cta-row">
+            <a class="btn" href="#work">VIEW PROJECTS <span>&rarr;</span></a>
+            <a class="btn solid" href="#contact">HIRE ME <span>&rarr;</span></a>
+          </div>
+        </div>
+        <figure class="photo" id="photo"></figure>
+      </div>
+    </section>
+
+    <div class="marquee dark" aria-hidden="true"><div class="track" id="track"></div></div>
+
+    <section id="about" class="light block">
+      <div class="wrap">
+        <div class="head"><h2>ABOUT ME</h2><span class="idx">/ 01</span></div>
+        <div class="about-grid">
+          <div class="prose" id="aboutText"></div>
+          <aside>
+            <ul class="facts" id="facts"></ul>
+            <div class="current" id="current"></div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section id="why" class="dark block">
+      <div class="wrap">
+        <div class="head"><h2>WHY HIRE ME?</h2><span class="idx">/ 02</span></div>
+        <blockquote id="quote"></blockquote>
+        <div class="why-grid" id="why"></div>
+      </div>
+    </section>
+
+    <section id="skills" class="light block">
+      <div class="wrap">
+        <div class="head"><h2>SKILLS &amp; EXPERTISE</h2><span class="idx">/ 03</span></div>
+        <div class="skill-grid" id="skillGrid"></div>
+      </div>
+    </section>
+
+    <section id="work" class="dark block">
+      <div class="wrap">
+        <div class="head"><h2>MY WORKS</h2><span class="idx">/ 04</span></div>
+        <div class="filters" id="filters" role="tablist" aria-label="Filter projects"></div>
+        <div class="work-grid" id="workGrid"></div>
+      </div>
+    </section>
+
+    <section id="process" class="light block">
+      <div class="wrap">
+        <div class="head"><h2>MY WORKFLOW</h2><span class="idx">/ 05</span></div>
+        <ol class="steps" id="steps"></ol>
+      </div>
+    </section>
+
+    <section id="contact" class="dark block">
+      <div class="wrap">
+        <div class="head"><h2>GET IN TOUCH</h2><span class="idx">/ 06</span></div>
+        <p class="cta-line">HAVE A SYSTEM TO BUILD OR A CRM TO FIX? LET'S TALK.</p>
+        <div class="contact-grid">
+          <ul class="links" id="links"></ul>
+          <form id="form" class="form" novalidate>
+            <label>FULL NAME<input name="name" required autocomplete="name" /></label>
+            <label>EMAIL ADDRESS<input name="email" type="email" required autocomplete="email" /></label>
+            <label>TELL ME ABOUT YOUR PROJECT<textarea name="msg" rows="4" required></textarea></label>
+            <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+            <button class="btn solid" type="submit">SEND MESSAGE</button>
+            <p class="form-note" id="formNote" role="status"></p>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot dark">
+    <div class="wrap foot-grid">
+      <div><b class="brand">DHANRAJ NAIK</b><p>Software and CRM development: web apps, mobile apps, automations and AI workflows.</p></div>
+      <div><h3>NAVIGATION</h3><a href="#top">Home</a><a href="#about">About</a><a href="#work">Portfolio</a><a href="#process">Process</a></div>
+      <div><h3>CONNECT</h3><a id="footMail"></a></div>
+    </div>
+    <p class="copy">&copy; <span id="year"></span> DHANRAJ NAIK. All rights reserved.</p>
+  </footer>
+
+  <dialog id="modal" aria-labelledby="mTitle">
+    <button class="close" id="mClose" aria-label="Close">&times;</button>
+    <div id="mBody"></div>
+  </dialog>
+
+  <dialog id="thanks" class="thanks" aria-labelledby="tTitle">
+    <div class="tick" aria-hidden="true">&#10003;</div>
+    <h3 id="tTitle">Thank you!</h3>
+    <p>Your message has been sent. I'll reply within one working day.</p>
+    <button class="btn solid" id="tClose" type="button">CLOSE</button>
+  </dialog>
+
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
